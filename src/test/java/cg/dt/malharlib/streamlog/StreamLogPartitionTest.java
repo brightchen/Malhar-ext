@@ -62,7 +62,7 @@ public class StreamLogPartitionTest {
     //for log
     TupleWriteOperator<TestTuple> logOperator = new TupleWriteOperator<TestTuple>();
     logOperator.setFilePath("/tmp/sl/StreamLog.out");
-    sm.persistStream(logOperator);
+    sm.persist(logOperator);
 
     Configuration conf = new Configuration(false);
     lma.prepareDAG(app, conf);

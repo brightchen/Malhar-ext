@@ -50,7 +50,7 @@ public class StreamLogApp implements StreamingApplication {
     //for log
     TupleWriteOperator<TestTuple> logOperator = new TupleWriteOperator<TestTuple>();
     logOperator.setFilePath("/tmp/sl/StreamLog.out");
-    sm.persistStream(logOperator);
+    sm.persist(logOperator);
   }
   
 }

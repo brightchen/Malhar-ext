@@ -1,23 +1,22 @@
 package cg.dt.malharlib.streamlog;
 
 import org.apache.hadoop.conf.Configuration;
-import org.junit.Test;
 
 import com.datatorrent.api.Context.PortContext;
 import com.datatorrent.api.DAG;
 import com.datatorrent.api.DAG.Locality;
 import com.datatorrent.api.DAG.StreamMeta;
-import com.datatorrent.api.LocalMode;
 import com.datatorrent.api.StreamCodec;
 import com.datatorrent.api.StreamingApplication;
+import com.datatorrent.api.annotation.ApplicationAnnotation;
 import com.datatorrent.lib.codec.KryoSerializableStreamCodec;
 
 import cg.dt.malharlib.TupleWriteOperator;
 import cg.dt.malharlib.util.POJOTupleGenerateOperator;
 import cg.dt.malharlib.util.TestTuple;
 
-public class StreamLogPartitionTest {
-  
+@ApplicationAnnotation(name="StreamLogTestApp")
+public class StreamLogApp implements StreamingApplication {
   public static class LogTestCodec extends KryoSerializableStreamCodec<TestTuple>
   {
     private static final long serialVersionUID = -2061989344770955107L;
@@ -29,20 +28,9 @@ public class StreamLogPartitionTest {
     }
   };
   
-  @Test
-  public void test() throws Exception
+  @Override
+  public void populateDAG(DAG dag, Configuration conf)
   {
-    // Create DAG for testing.
-    LocalMode lma = LocalMode.newInstance();
-
-    StreamingApplication app = new StreamingApplication() {
-      @Override
-      public void populateDAG(DAG dag, Configuration conf)
-      {
-      }
-    };
-
-    DAG dag = lma.getDAG();
 
     POJOTupleGenerateOperator<TestTuple> generator = new POJOTupleGenerateOperator<TestTuple>();
     generator.setTupleType(TestTuple.class);
@@ -63,16 +51,6 @@ public class StreamLogPartitionTest {
     TupleWriteOperator<TestTuple> logOperator = new TupleWriteOperator<TestTuple>();
     logOperator.setFilePath("/tmp/sl/StreamLog.out");
     sm.persistStream(logOperator);
-
-    Configuration conf = new Configuration(false);
-    lma.prepareDAG(app, conf);
-
-    // Create local cluster
-    final LocalMode.Controller lc = lma.getController();
-    lc.runAsync();
-    
-    Thread.sleep(60000);
-    lc.shutdown();
   }
   
 }

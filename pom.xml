@@ -6,6 +6,12 @@
 	<packaging>jar</packaging>
 	<version>0.0.1-SNAPSHOT</version>
 
+	<parent>
+	  <groupId>com.datatorrent</groupId>
+	  <artifactId>malhar-demos</artifactId>
+	  <version>2.2.0-SNAPSHOT</version>
+	</parent>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
@@ -33,8 +39,8 @@
 			<groupId>com.datatorrent</groupId>
 			<artifactId>malhar-contrib</artifactId>
 			<version>2.2.0-SNAPSHOT</version>
-			<scope>test</scope>
-			<classifier>tests</classifier>
+			<!-- <scope>test</scope> -->
+			<!-- <classifier>tests</classifier> -->
 		</dependency>
 	
 		<dependency>
@@ -56,7 +62,6 @@
 
 	<build>
 		<plugins>
-			<!-- Make this jar executable -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<!-- <artifactId>maven-shade-plugin</artifactId> -->

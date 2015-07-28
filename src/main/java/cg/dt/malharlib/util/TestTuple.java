@@ -2,9 +2,7 @@ package cg.dt.malharlib.util;
 
 import java.io.Serializable;
 
-import com.datatorrent.contrib.util.TestPOJO;
-
-public class TestTuple  implements Serializable
+public class TestTuple implements Serializable
 {
   private static final long serialVersionUID = 2153417121590225192L;
   
@@ -87,13 +85,13 @@ public class TestTuple  implements Serializable
   {
     if( obj == null )
       return false;
-    if( !( obj instanceof TestPOJO ) )
+    if( !( obj instanceof TestTuple ) )
       return false;
     
-    return completeEquals( (TestPOJO)obj );
+    return completeEquals( (TestTuple)obj );
   }
 
-  public boolean outputFieldsEquals( TestPOJO other )
+  public boolean outputFieldsEquals( TestTuple other )
   {
     if( other == null )
       return false;
@@ -106,7 +104,7 @@ public class TestTuple  implements Serializable
     return true;
   }
   
-  public boolean completeEquals( TestPOJO other )
+  public boolean completeEquals( TestTuple other )
   {
     if( other == null )
       return false;

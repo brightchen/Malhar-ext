@@ -11,10 +11,8 @@ import com.datatorrent.common.util.BaseOperator;
 import com.datatorrent.lib.codec.KryoSerializableStreamCodec;
 import com.datatorrent.netlet.util.Slice;
 
-import cg.dt.malharlib.fs.FsSaver;
-
 public class TupleWriteOperator<T> extends BaseOperator {
-  private static final Logger logger = LoggerFactory.getLogger(BlockWriterTester.class);
+  private static final Logger logger = LoggerFactory.getLogger(TupleWriteOperator.class);
   
   public final int COUNT = 100000;
   public final int BLOCK_SIZE = 100;

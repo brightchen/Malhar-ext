@@ -16,7 +16,7 @@ public class TupleGenerator<T>
   private volatile long rowId = 0;
   private Constructor<T> constructor;
   
-  private static Class<?>[] paramTypes = new Class<?>[]{ Long.class, long.class, Integer.class, int.class };
+  private static Class<?>[] paramTypes = new Class<?>[]{ Long.class, long.class };
   
   public TupleGenerator()
   {

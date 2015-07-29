@@ -40,6 +40,8 @@ public class SimpleFileWriter implements Writer{
     }
     try {
       fos.write(data, start, length);
+      //flush each time
+      flush();
     } catch (IOException e) {
       e.printStackTrace();
     }

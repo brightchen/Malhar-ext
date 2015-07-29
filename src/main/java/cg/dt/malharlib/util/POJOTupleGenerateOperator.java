@@ -2,6 +2,9 @@ package cg.dt.malharlib.util;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.datatorrent.api.Context.OperatorContext;
 import com.datatorrent.api.DefaultOutputPort;
 import com.datatorrent.api.InputOperator;
@@ -12,10 +15,12 @@ import com.datatorrent.api.Operator.ActivationListener;
  */
 public class POJOTupleGenerateOperator<T> implements InputOperator, ActivationListener<OperatorContext>
 {
+  private static final Logger logger = LoggerFactory.getLogger( POJOTupleGenerateOperator.class );
+  
   protected final int DEFAULT_TUPLE_NUM = 10000;
   public final transient DefaultOutputPort<T> outputPort = new DefaultOutputPort<T>();
   
-  private int blockTime = 100;
+  private int blockTime = 10;
   private int tupleNum = DEFAULT_TUPLE_NUM;
   private int batchNum = 5;
   private TupleGenerator<T> tupleGenerator = null;
@@ -116,7 +121,10 @@ public class POJOTupleGenerateOperator<T> implements InputOperator, ActivationLi
   
   
   protected void tupleEmitted( T tuple ){}
-  protected void tupleEmitDone(){}
+  protected void tupleEmitDone()
+  {
+    logger.info("Tuple Emit Done. {}", tupleNum );
+  }
   
   public int getEmitedTupleCount()
   {

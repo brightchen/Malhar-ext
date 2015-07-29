@@ -15,6 +15,7 @@ public class POJOTupleGenerateOperator<T> implements InputOperator, ActivationLi
   protected final int DEFAULT_TUPLE_NUM = 10000;
   public final transient DefaultOutputPort<T> outputPort = new DefaultOutputPort<T>();
   
+  private int blockTime = 100;
   private int tupleNum = DEFAULT_TUPLE_NUM;
   private int batchNum = 5;
   private TupleGenerator<T> tupleGenerator = null;
@@ -97,6 +98,17 @@ public class POJOTupleGenerateOperator<T> implements InputOperator, ActivationLi
           tupleEmitDone();
           return;
         }
+        if(blockTime >= 0)
+        {
+          try
+          {
+            Thread.sleep(blockTime);
+          }
+          catch(Exception e)
+          {
+            
+          }
+        }
       }
       
     }
@@ -132,4 +144,21 @@ public class POJOTupleGenerateOperator<T> implements InputOperator, ActivationLi
   {
     return new TupleGenerator( tupleClass );
   }
+
+  public int getBlockTime() {
+    return blockTime;
+  }
+
+  public void setBlockTime(int blockTime) {
+    this.blockTime = blockTime;
+  }
+
+  public int getBatchNum() {
+    return batchNum;
+  }
+
+  public void setBatchNum(int batchNum) {
+    this.batchNum = batchNum;
+  }
+  
 }

@@ -25,7 +25,7 @@ public class StreamLogPartitionTest {
     @Override
     public int getPartition(TestTuple tuple)
     {
-      return (int)(tuple.getRowId()%10);
+      return (int)(tuple.getRowId()%3);
     }
   };
   

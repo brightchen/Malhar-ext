@@ -33,6 +33,10 @@ public class TestTuple implements Serializable
     setAddress(address);
   }
   
+  public TestTuple(String row)
+  {
+    setRow(row);
+  }
 
   public String getRow()
   {

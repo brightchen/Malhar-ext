@@ -1,5 +1,8 @@
 package cg.dt.malharlib.streamlog;
 
+import java.util.List;
+import java.util.Map;
+
 import org.apache.hadoop.conf.Configuration;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -8,6 +11,9 @@ import org.slf4j.LoggerFactory;
 import com.datatorrent.api.DAG;
 import com.datatorrent.api.LocalMode;
 import com.datatorrent.api.StreamingApplication;
+import com.google.common.collect.Maps;
+
+import cg.dt.malharlib.TupleCacheOutputOperator;
 
 
 public class StreamLogPartitionTest extends StreamLogApp {
@@ -39,8 +45,8 @@ public class StreamLogPartitionTest extends StreamLogApp {
     
     if(outputOperator != null)
     {
-      int lastReceivedSize = 0;
-      int receivedSize = 0;
+      Map<Integer, Integer> lastReceivedSizes = Maps.newHashMap();
+      Map<Integer, Integer> receivedSize = Maps.newHashMap();
       while(true)
       {
         try
@@ -51,12 +57,20 @@ public class StreamLogPartitionTest extends StreamLogApp {
         {
           e.printStackTrace();
         }
-        receivedSize = outputOperator.getReceivedTuples() == null ? 0 : outputOperator.getReceivedTuples().size();
         
-        logger.info( "total received size: {}", receivedSize );
-        if(lastReceivedSize == receivedSize && receivedSize != 0 )
+        Map< Integer, List<?> > tuplesMap = TupleCacheOutputOperator.getReceivedTuplesMap();
+        for( Map.Entry< Integer, List<?> > entry : tuplesMap.entrySet() )
+        {
+          receivedSize.put(entry.getKey(), entry.getValue().size());
+          logger.info( "total received size: {}\t{}", entry.getKey(), entry.getValue().size() );
+        }
+        if(receivedSize.equals(lastReceivedSizes))
           break;
-        lastReceivedSize = receivedSize;
+        else
+        {
+          lastReceivedSizes = receivedSize;
+          receivedSize.clear();
+        }
       }
     }
     else

@@ -1,5 +1,6 @@
 package cg.dt.malharlib;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,45 +15,49 @@ import com.datatorrent.api.Context.OperatorContext;
 import com.datatorrent.api.annotation.InputPortFieldAnnotation;
 import com.datatorrent.common.util.BaseOperator;
 
-public class TupleCacheOutputOperator<T>  extends BaseOperator
+
+public class TupleCacheOutputOperator<T>  extends BaseOperator implements Serializable
 {
   private static final long serialVersionUID = 3090932382383138500L;
   private static final Logger logger = LoggerFactory.getLogger( TupleCacheOutputOperator.class );
   
   //one instance of TupleCacheOutputOperator map to one 
-  private static transient Map< String, List<?> > receivedTuplesMap = new ConcurrentHashMap< String, List<?>>();
+  private static transient Map< Integer, List<?> > receivedTuplesMap = new ConcurrentHashMap< Integer, List<?>>();
   
   private transient List<T> receivedTuples = null;
   
   //the StreamMeta.persistent() will throw NullPointerException if don't put annotation
   @InputPortFieldAnnotation(optional = true)
-  public final transient DefaultInputPort<T> inputPort = new DefaultInputPort<T>() {
-
-    @Override
-    public void process(T tuple)
-    {
-      processTuple( tuple );
-    }
-  };
+  public final transient TupleCacheInputPort<T> inputPort = new TupleCacheInputPort<T>();
+//  public final transient DefaultInputPort<T> inputPort = new DefaultInputPort<T>() {
+//
+//    @Override
+//    public void process(T tuple)
+//    {
+//      processTuple( tuple );
+//    }
+//  };
   
-  private String uuid;
+  private transient int identity;
   
   public TupleCacheOutputOperator()
   {
-    uuid = java.util.UUID.randomUUID().toString();
+    identity = System.identityHashCode(this);
   }
   
   
   public void setup(OperatorContext context)
   {
+    inputPort.setOperator(this);
     prepareReceivedTupleList();
     logger.debug( "setup() done." );
   }
   
-  public String getUuid()
-  {
-    return uuid;
+
+  public int getIdentity() {
+    return identity;
   }
+
 
   public  void processTuple( T tuple )
   {
@@ -61,7 +66,7 @@ public class TupleCacheOutputOperator<T>  extends BaseOperator
       receivedTuples.add(tuple);
       
       if( receivedTuples.size()%1000 == 0 )
-        logger.debug( "( {}, {} ): {}.", getName(), System.identityHashCode(this), receivedTuples.size() );
+        logger.debug( "( {}, {}, {} ): {}.", getName(), identity, System.identityHashCode(this), receivedTuples.size() );
     }
   }
 
@@ -69,12 +74,12 @@ public class TupleCacheOutputOperator<T>  extends BaseOperator
   {
     if( receivedTuples == null )
     {
-      receivedTuples = (List<T>)receivedTuplesMap.get(uuid);
+      receivedTuples = (List<T>)receivedTuplesMap.get(identity);
     }
     if( receivedTuples == null )
     {
       receivedTuples = new ArrayList<T>();
-      receivedTuplesMap.put(uuid, receivedTuples);
+      receivedTuplesMap.put(identity, receivedTuples);
     }
     return receivedTuples;
   }
@@ -83,7 +88,7 @@ public class TupleCacheOutputOperator<T>  extends BaseOperator
   {
     if( receivedTuples == null )
     {
-      receivedTuples = (List<T>)receivedTuplesMap.get(uuid);
+      receivedTuples = (List<T>)receivedTuplesMap.get(identity);
     }
     return receivedTuples;
   }
@@ -91,5 +96,9 @@ public class TupleCacheOutputOperator<T>  extends BaseOperator
   public static List<Object> getReceivedTuples( String uuid )
   {
     return (List<Object>)receivedTuplesMap.get(uuid);
+  }
+  public static Map< Integer, List<?> > getReceivedTuplesMap()
+  {
+    return receivedTuplesMap;
   }
 }

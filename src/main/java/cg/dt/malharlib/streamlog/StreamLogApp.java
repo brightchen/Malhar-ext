@@ -1,5 +1,10 @@
 package cg.dt.malharlib.streamlog;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.hadoop.conf.Configuration;
 
 import com.datatorrent.api.Context.OperatorContext;
@@ -7,6 +12,8 @@ import com.datatorrent.api.Context.PortContext;
 import com.datatorrent.api.DAG;
 import com.datatorrent.api.DAG.Locality;
 import com.datatorrent.api.DAG.StreamMeta;
+import com.datatorrent.api.Operator.InputPort;
+import com.datatorrent.api.Partitioner.PartitionKeys;
 import com.datatorrent.api.DefaultInputPort;
 import com.datatorrent.api.DefaultOutputPort;
 import com.datatorrent.api.StreamCodec;
@@ -16,6 +23,10 @@ import com.datatorrent.common.partitioner.StatelessPartitioner;
 import com.datatorrent.common.util.BaseOperator;
 import com.datatorrent.lib.codec.KryoSerializableStreamCodec;
 import com.datatorrent.lib.math.Sum;
+import com.datatorrent.stram.plan.logical.LogicalPlan;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import cg.dt.malharlib.TupleCacheOutputOperator;
 import cg.dt.malharlib.TupleWriteOperator;
@@ -27,19 +38,19 @@ import cg.dt.malharlib.util.SimpleTuple;
 public class StreamLogApp implements StreamingApplication {
   
   
-  /********************************
-  public static class LogTestCodec extends KryoSerializableStreamCodec<TestTuple>
+  /********************************/
+  public static class LogTestCodec extends KryoSerializableStreamCodec
   {
     private static final long serialVersionUID = -2061989344770955107L;
-
+    private int index=0;
     @Override
-    public int getPartition(TestTuple tuple)
+    public int getPartition(Object tuple)
     {
-      return (int)(long)tuple.getRowId();
+      return index++;
     }
   };
   
-  
+  /********************************
   public static class LogTestCodec2 implements StreamCodec<TestTuple>, Serializable
   {
     private static final long serialVersionUID = -7025318072432275282L;
@@ -64,8 +75,20 @@ public class StreamLogApp implements StreamingApplication {
   };
   /********************************/
   
+  protected final StreamCodec codec = new LogTestCodec();
   
-  protected final StreamCodec codec = new KryoSerializableStreamCodec();
+//  protected final StreamCodec codec = new KryoSerializableStreamCodec()
+//      {
+//        private static final long serialVersionUID = 4722137400889855237L;
+//
+//        @Override
+//        public int getPartition(Object t)
+//        {
+//          return 1;
+//        }
+//      };
+  
+  public static final int TUPLE_SIZE = 10000;
   protected final Class tupleClass = SimpleTuple.class; //TestTuple.class;
   protected final String logFilePath = "/tmp/sl/StreamLog.out";
   protected final String writeFilePath = "/tmp/sl/TupleWriter.out";
@@ -79,7 +102,7 @@ public class StreamLogApp implements StreamingApplication {
   {
     POJOTupleGenerateOperator generator = new POJOTupleGenerateOperator();
     generator.setBlockTime(1);
-    generator.setTupleNum(10000);
+    generator.setTupleNum(TUPLE_SIZE);
     generator.setTupleType(tupleClass);
     dag.addOperator("generator", generator);
     
@@ -118,15 +141,27 @@ public class StreamLogApp implements StreamingApplication {
   protected StreamMeta addWorkOperator( DAG dag, DefaultOutputPort upstreamOutputPort, BaseOperator operator, DefaultInputPort operatorInputPort  )
   {
     dag.addOperator("writer", operator);
-    
-    //partition
-    dag.getMeta(operator).getAttributes().put(OperatorContext.PARTITIONER, new StatelessPartitioner<Sum<Integer>>(2));
-    
+
     dag.setInputPortAttribute(operatorInputPort, PortContext.STREAM_CODEC, codec);
     
     // Connect ports
     StreamMeta sm = dag.addStream("stream1", upstreamOutputPort, operatorInputPort).setLocality(Locality.CONTAINER_LOCAL);
+    /*****************/
+    List<Map<InputPort<?>, PartitionKeys>> partionKeysList = Lists.newArrayList();
+    {
+      Map<InputPort<?>, PartitionKeys> partionKeys = Maps.newHashMap();
+      partionKeys.put(operatorInputPort, new PartitionKeys(0x03, Sets.newHashSet(3)));
+      partionKeysList.add(partionKeys);
+    }
+    {
+      Map<InputPort<?>, PartitionKeys> partionKeys = Maps.newHashMap();
+      partionKeys.put(operatorInputPort, new PartitionKeys(0x03, Sets.newHashSet(1)));
+      partionKeysList.add(partionKeys);
+    }
     
+    //partition
+    dag.getMeta(operator).getAttributes().put(OperatorContext.PARTITIONER, new Partitioner1( partionKeysList ) ); //new StatelessPartitioner<Sum<Integer>>(2));
+    /*****************/
     return sm;
   }
   

@@ -20,7 +20,7 @@ public class TupleCacheOutputOperator<T>  extends BaseOperator
   private static final Logger logger = LoggerFactory.getLogger( TupleCacheOutputOperator.class );
   
   //one instance of TupleCacheOutputOperator map to one 
-  private static Map< String, List<?> > receivedTuplesMap = new ConcurrentHashMap< String, List<?>>();
+  private static transient Map< String, List<?> > receivedTuplesMap = new ConcurrentHashMap< String, List<?>>();
   
   private transient List<T> receivedTuples = null;
   
@@ -54,12 +54,15 @@ public class TupleCacheOutputOperator<T>  extends BaseOperator
     return uuid;
   }
 
-  public synchronized void processTuple( T tuple )
+  public  void processTuple( T tuple )
   {
-    receivedTuples.add(tuple);
-    
-    if( receivedTuples.size()%1000 == 0 )
-      logger.debug( "( {}, {} ): {}.", getName(), System.identityHashCode(this), receivedTuples.size() );
+    synchronized(TupleCacheOutputOperator.class)
+    {
+      receivedTuples.add(tuple);
+      
+      if( receivedTuples.size()%1000 == 0 )
+        logger.debug( "( {}, {} ): {}.", getName(), System.identityHashCode(this), receivedTuples.size() );
+    }
   }
 
   public List<T> prepareReceivedTupleList()

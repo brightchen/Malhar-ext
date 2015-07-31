@@ -78,8 +78,8 @@ public class StreamLogApp implements StreamingApplication {
   public void populateDAG(DAG dag, Configuration conf)
   {
     POJOTupleGenerateOperator generator = new POJOTupleGenerateOperator();
-    generator.setBlockTime(10);
-    //generator.setTupleNum(10000);
+    generator.setBlockTime(1);
+    generator.setTupleNum(10000);
     generator.setTupleType(tupleClass);
     dag.addOperator("generator", generator);
     

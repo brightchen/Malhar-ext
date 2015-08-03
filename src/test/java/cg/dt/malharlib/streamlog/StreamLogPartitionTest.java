@@ -65,7 +65,15 @@ public class StreamLogPartitionTest extends StreamLogApp {
           logger.info( "total received size: {}\t{}", entry.getKey(), entry.getValue().size() );
         }
         if(receivedSize.equals(lastReceivedSizes))
+        {
+          for( Map.Entry< Integer, List<?> > entry : tuplesMap.entrySet() )
+          {
+            logger.debug("{}:", entry.getKey());
+            logger.debug(toString(entry.getValue(), 100));
+              
+          }
           break;
+        }
         else
         {
           lastReceivedSizes = receivedSize;
@@ -79,4 +87,11 @@ public class StreamLogPartitionTest extends StreamLogApp {
     lc.shutdown();
   }
   
+  public static String toString( List<?> list, int size )
+  {
+    StringBuilder sb = new StringBuilder();
+    for( int i=0; i<Math.min(list.size(),size); ++i )
+      sb.append( list.get(i).toString() ).append(", ");
+    return sb.toString();
+  }
 }

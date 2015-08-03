@@ -29,7 +29,12 @@ public class SimpleTuple implements Serializable{
   @Override
   public int hashCode()
   {
-    return id.hashCode();
+    return Integer.valueOf(id);
   }
   
+  @Override
+  public String toString()
+  {
+    return id;
+  }
 }

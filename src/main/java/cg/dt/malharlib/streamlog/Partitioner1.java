@@ -57,23 +57,25 @@ public class Partitioner1<T extends Operator> implements Partitioner<T>, Seriali
       // data to remaining input ports
       // this gives control over which stream to partition under default
       // partitioning to the DAG writer
-      List<InputPort<?>> inputPortList = context.getInputPorts();
-      if (inputPortList != null && !inputPortList.isEmpty()) {
-        DefaultPartition.assignPartitionKeys(newPartitions, inputPortList.iterator().next());
-      }
+      // this code changed the flow of data
+//      List<InputPort<?>> inputPortList = context.getInputPorts();
+//      if (inputPortList != null && !inputPortList.isEmpty()) {
+//        DefaultPartition.assignPartitionKeys(newPartitions, inputPortList.iterator().next());
+//      }
       return newPartitions;
     } 
     else {
       // define partitions is being called again
-      Collection<Partition<T>> newPartitions = null;
-      if (context.getParallelPartitionCount() != 0) {
-        newPartitions = repartitionParallel(partitions, context);
-      } else if (partition.getPartitionKeys().isEmpty()) {
-        newPartitions = repartitionInputOperator(partitions);
-      } else {
-        newPartitions = repartition(partitions);
-      }
-      return newPartitions;
+      return partitions;
+//      Collection<Partition<T>> newPartitions = null;
+//      if (context.getParallelPartitionCount() != 0) {
+//        newPartitions = repartitionParallel(partitions, context);
+//      } else if (partition.getPartitionKeys().isEmpty()) {
+//        newPartitions = repartitionInputOperator(partitions);
+//      } else {
+//        newPartitions = repartition(partitions);
+//      }
+//      return newPartitions;
     }
     
   }

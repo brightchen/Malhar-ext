@@ -2,6 +2,7 @@ package cg.dt.malharlib;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,11 +21,13 @@ public class TupleCacheOutputOperator<T>  extends BaseOperator implements Serial
 {
   private static final long serialVersionUID = 3090932382383138500L;
   private static final Logger logger = LoggerFactory.getLogger( TupleCacheOutputOperator.class );
+  public static final int LOG_PERIOD = 30000;
   
   //one instance of TupleCacheOutputOperator map to one 
-  private static transient Map< Integer, List<?> > receivedTuplesMap = new ConcurrentHashMap< Integer, List<?>>();
+  protected static transient Map< Integer, List<?> > receivedTuplesMap = new ConcurrentHashMap< Integer, List<?>>();
   
-  private transient List<T> receivedTuples = null;
+  protected transient long lastLogTime = 0;
+  protected transient List<T> receivedTuples = null;
   
   //the StreamMeta.persistent() will throw NullPointerException if don't put annotation
   @InputPortFieldAnnotation(optional = true)
@@ -50,6 +53,7 @@ public class TupleCacheOutputOperator<T>  extends BaseOperator implements Serial
   {
     inputPort.setOperator(this);
     prepareReceivedTupleList();
+    lastLogTime = Calendar.getInstance().getTimeInMillis();
     logger.debug( "setup() done." );
   }
   
@@ -65,8 +69,13 @@ public class TupleCacheOutputOperator<T>  extends BaseOperator implements Serial
     {
       receivedTuples.add(tuple);
       
-      if( receivedTuples.size()%1000 == 0 )
-        logger.debug( "( {}, {}, {} ): {}.", getName(), identity, System.identityHashCode(this), receivedTuples.size() );
+      if( receivedTuples.size()%500 == 0 )
+        logger.info( "Quantity: ( {}, {}, {} ): {}.", getName(), identity, System.identityHashCode(this), receivedTuples.size() );
+      if( lastLogTime != 0 && Calendar.getInstance().getTimeInMillis() >= lastLogTime + LOG_PERIOD )
+      {
+        lastLogTime = Calendar.getInstance().getTimeInMillis();
+        logger.info( "Period: ( {}, {}, {} ): {}.", getName(), identity, System.identityHashCode(this), receivedTuples.size() );
+      }
     }
   }
 

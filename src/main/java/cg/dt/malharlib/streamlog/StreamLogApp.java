@@ -134,13 +134,13 @@ public class StreamLogApp implements StreamingApplication {
       TupleWriteOperator logOperator = new TupleWriteOperator();
       logOperator.setName("log");
       logOperator.setFilePath(logFilePath);
-      sm.persist(logOperator);
+      //sm.persist(logOperator);
     }
     else
     {
       TupleCacheOutputOperator logOperator = new TupleCacheOutputOperator();
       logOperator.setName("log");
-      sm.persist(logOperator);
+      //sm.persist(logOperator);
     }
   }
   

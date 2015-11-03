@@ -1,0 +1,12 @@
+
+dimension factors
+  - key:
+    - simple key: one key, equals by value equals
+    - range key: equals if the value in the range. for example time slot
+    - composite key: "or" or "and" relationship between/among keys
+    
+  - value: the value get from each record
+  
+  - expression: the expression among values and different record. for example Sum, count etc
+  
+  

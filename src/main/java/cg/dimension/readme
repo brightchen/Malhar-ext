@@ -7,6 +7,16 @@ dimension factors
     
   - value: the value get from each record
   
-  - expression: the expression among values and different record. for example Sum, count etc
+  - expression/aggregate: the expression among values and different record. for example Sum, count etc
+  
+  
+- Data Structure
+  - Record: the data for processing
+  
+  - DimensionDescriptor: The description of the dimension: 
+    - keys
+    - dimensions
+    - values
+    - aggregate
   
   

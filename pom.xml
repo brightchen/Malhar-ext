@@ -7,25 +7,14 @@
 
   <parent>
     <groupId>com.datatorrent</groupId>
-    <artifactId>malhar-demos</artifactId>
-    <version>3.2.0-SNAPSHOT</version>
+    <artifactId>dt-megh</artifactId>
+    <version>3.3.0-SNAPSHOT</version>
   </parent>
 
   <dependencies>
-  <!-- 
-    <dependency>
-      <groupId>org.apache.hadoop</groupId>
-      <artifactId>hadoop-yarn-client</artifactId>
-      <version>2.2.0</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.hadoop</groupId>
-      <artifactId>hadoop-common</artifactId>
-      <version>2.2.0</version>
-      <scope>compile</scope>
-    </dependency>
-    -->
+    <!-- <dependency> <groupId>org.apache.hadoop</groupId> <artifactId>hadoop-yarn-client</artifactId> <version>2.2.0</version> 
+      <scope>compile</scope> </dependency> <dependency> <groupId>org.apache.hadoop</groupId> <artifactId>hadoop-common</artifactId> 
+      <version>2.2.0</version> <scope>compile</scope> </dependency> -->
     <dependency>
       <groupId>com.datatorrent</groupId>
       <artifactId>dt-engine</artifactId>
@@ -42,11 +31,11 @@
       </exclusions>
     </dependency>
 
- 
+
     <dependency>
-      <groupId>com.datatorrent</groupId>
+      <groupId>org.apache.apex</groupId>
       <artifactId>malhar-contrib</artifactId>
-      <version>3.2.0-SNAPSHOT</version>
+      <version>3.3.0-incubating-SNAPSHOT</version>
       <!-- <scope>test</scope> -->
       <!-- <classifier>tests</classifier> -->
     </dependency>
@@ -90,9 +79,19 @@
       <artifactId>snappy-java</artifactId>
       <version>1.1.2</version>
       <type>jar</type>
-    <scope>compile</scope>
-  </dependency>
+      <scope>compile</scope>
+    </dependency>
 
+    <dependency>
+      <groupId>org.codehaus.janino</groupId>
+      <artifactId>commons-compiler</artifactId>
+      <version>2.7.8</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.janino</groupId>
+      <artifactId>janino</artifactId>
+      <version>2.7.8</version>
+    </dependency>
   </dependencies>
 
 
